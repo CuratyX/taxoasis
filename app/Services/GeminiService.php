@@ -9,7 +9,7 @@ class GeminiService // RENAMED CLASS
     protected $apiKey;
     // New Gemini API Endpoint
     protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/';
-    protected $model = 'gemini-2.5-flash'; // Recommended model for speed and capability
+    protected $model = 'gemini-3-flash-preview'; // Recommended model for speed and capability
 
     protected $systemPrompt = <<<'PROMPT'
 You are TaxOasis AI, a specialized assistant for UAE taxation matters. You are powered by Ecovis JRB Chartered Accountants, Dubai.
@@ -80,7 +80,7 @@ PROMPT;
     /**
      * Send a tax question to Gemini and get a response
      */
-    public function askTaxQuestion(string $question, bool $detailed = false): string
+    public function askTaxQuestion(string $question, bool $detailed = false, array $history = []): string
     {
         $systemPrompt = $this->systemPrompt;
 
@@ -92,46 +92,63 @@ PROMPT;
         $endpoint = $this->baseUrl . $this->model . ':generateContent';
 
         // Max tokens configuration for Gemini
-        $maxOutputTokens = $detailed ? 2000 : 1000;
+        $maxOutputTokens = $detailed ? 2000 : 2000;
 
-        // FINAL ROBUST FIX: Merge the System Prompt with the User's question
-        // This bypasses the structural rejection of the 'systemInstruction' field
-        $mergedQuestion = "SYSTEM INSTRUCTION: " . $systemPrompt . "\n\nUSER QUESTION: " . $question;
+        // --- 🛠️ MODIFICATION START: BUILDING THE CHAT HISTORY 🛠️ ---
 
-        // The 'contents' array now contains only the merged user input
-        $contents = [
-            [
+        $contents = [];
+
+        // 1. Add previous conversation turns to the contents array
+        foreach ($history as $msg) {
+            $contents[] = [
+                // Gemini API expects 'model' instead of 'assistant'
+                'role' => ($msg['role'] === 'assistant' || $msg['role'] === 'model') ? 'model' : 'user',
+                'parts' => [
+                    ['text' => $msg['content']]
+                ]
+            ];
+        }
+
+        // 2. Add the current question.
+        // If this is the very first message in the chat, merge the System Instruction.
+        if (empty($contents)) {
+            $mergedQuestion = "SYSTEM INSTRUCTION: " . $systemPrompt . "\n\nUSER QUESTION: " . $question;
+            $contents[] = [
                 'role' => 'user',
                 'parts' => [
-                    ['text' => $mergedQuestion] // Send the merged text
+                    ['text' => $mergedQuestion]
                 ]
-            ]
-        ];
+            ];
+        } else {
+            // Otherwise, just append the user's follow-up question
+            $contents[] = [
+                'role' => 'user',
+                'parts' => [
+                    ['text' => $question]
+                ]
+            ];
+        }
+
+        // --- 🛠️ MODIFICATION END 🛠️ ---
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->timeout(120)->post($endpoint . '?key=' . $this->apiKey, [
-
-            // The request now only contains contents and generationConfig
             'contents' => $contents,
-
-            // Use the correct key for generation parameters
             'generationConfig' => [
                 'maxOutputTokens' => $maxOutputTokens,
-                // 'systemInstruction' is intentionally omitted here
             ]
         ]);
 
         if ($response->failed()) {
             $status = $response->status();
             $body = $response->body();
-            // This will throw the specific API error into your logs (laravel.log)
             throw new \Exception("Gemini API HTTP request failed with status {$status}: " . $body);
         }
 
         $data = $response->json();
 
-        // Robust Response Parsing: Check for 'candidates' before processing
+        // Check for 'candidates' before processing
         if (!isset($data['candidates']) || empty($data['candidates'])) {
             $errorDetail = $data['error']['message'] ?? 'No candidate response returned from API. Check safety filters.';
             throw new \Exception("Gemini API failed to generate content. Detail: " . $errorDetail);
@@ -143,7 +160,6 @@ PROMPT;
              return $candidate['content']['parts'][0]['text'];
         }
 
-        // Handle safety blocks or other non-text finish reasons
         $finishReason = $candidate['finishReason'] ?? 'Unknown';
         throw new \Exception("Gemini API request failed (Parsing issue). Finish reason: " . $finishReason);
     }

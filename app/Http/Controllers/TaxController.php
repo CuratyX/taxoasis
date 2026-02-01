@@ -52,31 +52,60 @@ class TaxController extends Controller
     public function ask(Request $request)
     {
         $request->validate([
-            'query' => 'required|string|max:1000'
+            'query' => 'required|string|max:1000',
+            'history' => 'nullable|array'
         ]);
 
         $query = $request->input('query');
+        $history = $request->input('history', []);
 
-        try {
-            // UPDATED METHOD CALL
-            $response = $this->gemini->askTaxQuestion($query, false);
+        $maxRetries = 3; // Total attempts
+        $retryCount = 0;
 
-            $showEcovisCTA = $this->detectUncertainty($response);
+        while ($retryCount < $maxRetries) {
+            try {
+                // Attempt to get the answer from Gemini
+                $response = $this->gemini->askTaxQuestion($query, false, $history);
 
-            return view('layouts.result', [
-                'query' => $query,
-                'answer' => $response,
-                'showEcovisCTA' => $showEcovisCTA
-            ]);
+                // If successful, prepare the history and return the view
+                $history[] = ['role' => 'user', 'content' => $query];
+                $history[] = ['role' => 'model', 'content' => $response];
 
-        } catch (\Exception $e) {
-            // Log the error $e->getMessage() for debugging
-            return view('layouts.result', [
-                'query' => $query,
-                'answer' => 'I apologize, but I encountered an issue processing your question. Please try again or contact Ecovis JRB directly for assistance.',
-                'showEcovisCTA' => true,
-                'isError' => true
-            ]);
+                $currentUncertainty = $this->detectUncertainty($response);
+                $previouslyShown = false;
+                foreach ($history as $msg) {
+                    if ($msg['role'] === 'model' && $this->detectUncertainty($msg['content'])) {
+                        $previouslyShown = true;
+                        break;
+                    }
+                }
+
+                return view('layouts.result', [
+                    'query' => $query,
+                    'answer' => $response,
+                    'showEcovisCTA' => ($currentUncertainty || $previouslyShown),
+                    'history' => $history
+                ]);
+
+            } catch (\Exception $e) {
+                // Check for 503 (Overloaded) or 429 (Rate Limit)
+                $errorCode = $e->getCode();
+
+                if (($errorCode == 503 || $errorCode == 429) && $retryCount < $maxRetries - 1) {
+                    $retryCount++;
+                    sleep(2); // Wait 2 seconds before the next attempt
+                    continue;
+                }
+
+                // If all retries fail or it's a different error, return the error view
+                return view('layouts.result', [
+                    'query' => $query,
+                    'answer' => 'The TaxOasis servers are currently very busy. Please wait a moment and try again.',
+                    'showEcovisCTA' => true,
+                    'isError' => true,
+                    'history' => $history
+                ]);
+            }
         }
     }
 
@@ -86,14 +115,16 @@ class TaxController extends Controller
     public function detailed(Request $request)
     {
         $request->validate([
-            'query' => 'required|string|max:1000'
+            'query' => 'required|string|max:1000',
+            'history' => 'nullable|array'
         ]);
 
         $query = $request->input('query');
+        $history = $request->input('history', []);
 
         try {
-            // UPDATED METHOD CALL
-            $response = $this->gemini->askTaxQuestion($query, true);
+            // We pass the history to give context to the detailed analysis
+            $response = $this->gemini->askTaxQuestion($query, true, $history);
 
             return response()->json([
                 'success' => true,
@@ -101,7 +132,9 @@ class TaxController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // Log the error $e->getMessage() for debugging
+            // Log the error for your own debugging
+            \Log::error("Detailed Analysis Error: " . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'analysis' => 'Unable to load detailed analysis. Please try again.'

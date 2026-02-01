@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('assets/favicon/taxoasis-icon-64.png') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="TaxOasis - UAE Tax Intelligence powered by Ecovis JRB. Ask questions about UAE Corporate Tax, VAT, and Free Zone taxation.">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <title>@yield('title', 'TaxOasis - Your Tax Caravan Stops Here')</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Styles -->
     <style>
         :root {
@@ -98,25 +99,6 @@
             max-width: 600px;
         }
 
-        .query-input {
-            width: 100%;
-            padding: 20px 60px 20px 24px;
-            font-size: 17px;
-            font-family: inherit;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            background-color: var(--white);
-            color: var(--slate);
-            outline: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .query-input:focus {
-            border-color: var(--teal);
-            box-shadow: 0 4px 16px rgba(13, 148, 136, 0.15);
-        }
-
         .query-input::placeholder {
             color: var(--gray-light);
         }
@@ -140,7 +122,7 @@
         }
 
         .submit-btn:hover {
-            background-color: var(--teal-dark);
+            background-color: #3d5369;
         }
 
         .submit-btn:disabled {
@@ -260,12 +242,12 @@
         .mb-4 { margin-top: 16px; }
         .mb-6 { margin-bottom: 24px; }
     </style>
-    
+
     @yield('styles')
 </head>
 <body>
     @yield('content')
-    
+
     @yield('scripts')
 </body>
 </html>
