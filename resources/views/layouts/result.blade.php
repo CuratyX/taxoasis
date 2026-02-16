@@ -16,9 +16,11 @@
         body {
             background: radial-gradient(circle at center, #26384a 0%, var(--bg-dark) 100%);
             color: white;
-            font-family: 'Inter', -apple-system, sans-serif;
+            /* UPDATED: Matches Home & Guidelines */
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             margin: 0;
             min-height: 100vh;
+            font-weight: 400;
         }
 
         .header {
@@ -30,22 +32,29 @@
             z-index: 100;
         }
 
-        /* Branding consistency with Home */
+        /* --- UPDATED BRANDING TYPOGRAPHY --- */
         .logo-text {
             font-size: 24px;
-            font-weight: 700;
             letter-spacing: 1px;
             color: white;
+            display: flex;
+            align-items: baseline;
+            gap: 2px; /* Slight gap between TAX and Oasis */
         }
 
         .wordmark-tax {
-            font-weight: 400;
-            opacity: 0.9;
+            /* Guide: Plus Jakarta Sans, Bold (700), Uppercase */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            opacity: 1;
+            letter-spacing: 0.02em;
         }
 
         .wordmark-oasis {
-            color: var(--brand-gold);
-            font-family: "DM Serif Display", serif;
+            font-family: 'Libre Baskerville', serif;
+            font-weight: 400;
+            color: var(--light-gold);
         }
 
         .main-content {
@@ -63,16 +72,17 @@
 
         .query-label {
             font-size: 13px;
-            color: var(--brand-gold);
+            color: var(--light-gold);
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .query-text {
             font-size: 24px;
-            font-weight: 500;
+            font-weight: 500; /* Medium weight for questions */
             color: white;
             line-height: 1.4;
         }
@@ -83,45 +93,10 @@
             line-height: 1.8;
             height: auto !important;
             overflow: visible !important;
+            font-weight: 400; /* Regular weight for body text */
         }
 
-        /* Detailed Analysis Styling */
-        .detailed-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            background: var(--white-glass);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            cursor: pointer;
-            margin-bottom: 32px;
-            transition: all 0.3s;
-        }
-
-        .detailed-link:hover {
-            border-color: var(--brand-gold);
-            color: var(--brand-gold);
-        }
-
-        .detailed-content {
-            padding: 30px;
-            background-color: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            border: 1px solid var(--border-light);
-            margin-bottom: 32px;
-            display: none;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .detailed-content.show {
-            display: block;
-        }
-
-        /* Follow-up Container to match Home Search Bar */
+        /* Follow-up Container */
         .query-container {
             width: 100%;
             background: white;
@@ -140,6 +115,7 @@
             outline: none;
             color: #333;
             background: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .submit-btn {
@@ -158,19 +134,27 @@
         /* CTA Card Alignment */
         .cta-card {
             background: rgba(212, 168, 85, 0.1) !important;
-            border: 1px solid var(--brand-gold) !important;
+            border: 1px solid var(--light-gold) !important;
             padding: 30px;
             border-radius: 16px;
         }
 
         .cta-title {
-            color: var(--brand-gold);
+            color: var(--light-gold);
             margin-bottom: 10px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
         }
 
         .cta-text {
             color: white;
             margin-bottom: 20px;
+        }
+
+        /* Button Styling */
+        .btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
         }
 
         .disclaimer {
@@ -184,7 +168,7 @@
             border: 1px solid var(--border-light);
         }
 
-        /* Spinner for follow-up */
+        /* Spinner */
         .spinner {
             width: 20px;
             height: 20px;
@@ -398,7 +382,7 @@
             btn.disabled = true;
             // Set color to gold or white to ensure it shows up in the dark button
             btn.innerHTML =
-                '<div class="spinner" style="border-color: var(--brand-gold); border-top-color: transparent;"></div>';
+                '<div class="spinner" style="border-color: var(--light-gold); border-top-color: transparent;"></div>';
         });
 
         /**

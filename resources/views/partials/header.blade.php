@@ -114,7 +114,7 @@
                 </svg>
             </div> --}}
             <div class="header-wordmark">
-                <span style="font-weight: 500; color: white; opacity: 0.9;">TAX</span><span style="color: var(--brand-gold); font-family: 'DM Serif Display', serif;">Oasis</span>
+                <span style="font-weight: 500; color: white; opacity: 0.9;">TAX</span><span style="color: var(--light-gold); font-family: 'DM Serif Display', serif;">Oasis</span>
             </div>
         </a>
 

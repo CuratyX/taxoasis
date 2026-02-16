@@ -31,6 +31,31 @@
             --white: #FFFFFF;
         }
 
+        @font-face {
+            font-family: 'DM Serif Display';
+            font-style: normal;
+            font-weight: 400;
+            src: url("{{ asset('assets/fonts/dm-serif-display-v17-latin-regular.woff2') }}") format('woff2');
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Libre Baskerville';
+            font-style: normal;
+            font-weight: 400;
+            src: url("{{ asset('assets/fonts/libre-baskerville-v24-latin-regular.woff2') }}") format('woff2');
+            src: url("{{ asset('assets/fonts/libre-baskerville-v24-latin-regular.woff2') }}") format('woff2');
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Plus Jakarta Sans';
+            font-style: normal;
+            font-weight: 400;
+            src: url("{{ asset('assets/fonts/plus-jakarta-sans-v12-latin-regular.woff2') }}") format('woff2');
+            font-display: swap;
+        }
+
         * {
             margin: 0;
             padding: 0;
