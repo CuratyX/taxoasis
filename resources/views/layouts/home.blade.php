@@ -111,13 +111,17 @@
         .query-input {
             flex: 1;
             border: none;
-            padding: 15px 0px;
+            padding: 15px 42px 15px 0px;
             font-size: 1rem;
             outline: none;
             color: #333;
             background: transparent;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            /* Ensure input uses body font */
+            resize: none;
+            overflow-y: hidden;
+            line-height: 1.5;
+            min-height: 24px;
+            max-height: 150px;
         }
 
         .submit-btn {
@@ -424,8 +428,8 @@
         {{-- Main Query Form - Kept your 'ask' route --}}
         <form action="{{ route('ask') }}" method="POST" class="query-container" id="queryForm">
             @csrf
-            <input type="text" name="query" class="query-input" placeholder="What do you need to know?"
-                autocomplete="off" required maxlength="1000" id="queryInput">
+            <textarea name="query" class="query-input" placeholder="What do you need to know?"
+                required maxlength="1000" id="queryInput" rows="1"></textarea>
             <button type="submit" class="submit-btn" id="submitBtn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -573,6 +577,25 @@
                     }
                 });
             });
+        });
+
+        const queryInput = document.getElementById('queryInput');
+        const queryForm = document.getElementById('queryForm');
+
+        // Auto-expand textarea as user types
+        queryInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Submit on 'Enter' (unless Shift is held)
+        queryInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim() !== '') {
+                    document.getElementById('submitBtn').click(); // Triggers existing loading state logic
+                }
+            }
         });
     </script>
     <style>

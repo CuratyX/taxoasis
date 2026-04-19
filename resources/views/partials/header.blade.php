@@ -217,9 +217,9 @@
     .close-btn { background: none; border: none; color: white; font-size: 35px; cursor: pointer; }
 </style> --}}
 
-<script>
+{{-- <script>
     function toggleMenu() {
         document.getElementById('sideDrawer').classList.toggle('active');
         document.getElementById('drawerOverlay').classList.toggle('active');
     }
-</script>
+</script> --}}
